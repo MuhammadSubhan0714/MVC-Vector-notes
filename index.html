@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vector Calculus Notes</title>
+<link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:wght@400;600&family=Playfair+Display:wght@700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0d1b2a;
+    --navy2: #1b2d42;
+    --navy3: #243447;
+    --teal: #00c9a7;
+    --teal2: #00a88a;
+    --teal-dim: rgba(0,201,167,0.12);
+    --teal-dim2: rgba(0,201,167,0.06);
+    --amber: #ffb703;
+    --amber-dim: rgba(255,183,3,0.12);
+    --coral: #e05c5c;
+    --coral-dim: rgba(224,92,92,0.12);
+    --purple: #9b72cf;
+    --purple-dim: rgba(155,114,207,0.12);
+    --blue: #4ea8de;
+    --blue-dim: rgba(78,168,222,0.1);
+    --text: #d4e4f7;
+    --text-muted: #7a9bbf;
+    --border: rgba(0,201,167,0.15);
+    --card-bg: rgba(27,45,66,0.7);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--navy);
+    color: var(--text);
+    font-family: 'Nunito', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    min-height: 100vh;
+  }
+  /* === BACKGROUND GRID === */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(0,201,167,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,201,167,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+  /* === NAV === */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(13,27,42,0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 0 2rem;
+  }
+  .nav-inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  .nav-inner::-webkit-scrollbar { display: none; }
+  .nav-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    color: var(--teal);
+    white-space: nowrap;
+    margin-right: 2rem;
+    padding: 0.75rem 0;
+  }
+  nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    padding: 0.75rem 1rem;
+    white-space: nowrap;
+    transition: color 0.2s;
+    border-bottom: 2px solid transparent;
+  }
+  nav a:hover { color: var(--teal); border-bottom-color: var(--teal); }
+
+  /* === LAYOUT === */
+  .page {
+    position: relative;
+    z-index: 1;
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 5rem;
+  }
+
+  /* === HERO === */
+  .hero {
+    text-align: center;
+    margin-bottom: 4rem;
+    padding: 3rem 1rem;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: var(--card-bg);
+    backdrop-filter: blur(8px);
+  }
+  .hero-badge {
+    display: inline-block;
+    background: var(--teal-dim);
+    color: var(--teal);
+    border: 1px solid rgba(0,201,167,0.3);
+    border-radius: 20px;
+    padding: 4px 16px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3rem);
+    color: #fff;
+    line-height: 1.2;
+    margin-bottom: 0.75rem;
+  }
+  .hero h1 span { color: var(--teal); }
+  .hero p { color: var(--text-muted); max-width: 560px; margin: 0 auto; }
+  .topic-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 1.5rem;
+  }
+  .pill {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid;
+  }
+  .pill-teal   { background: var(--teal-dim);   color: var(--teal);   border-color: rgba(0,201,167,0.3); }
+  .pill-amber  { background: var(--amber-dim);  color: var(--amber);  border-color: rgba(255,183,3,0.3); }
+  .pill-coral  { background: var(--coral-dim);  color: var(--coral);  border-color: rgba(224,92,92,0.3); }
+  .pill-purple { background: var(--purple-dim); color: var(--purple); border-color: rgba(155,114,207,0.3); }
+
+  /* === SECTION HEADERS === */
+  .section {
+    margin-bottom: 3.5rem;
+    scroll-margin-top: 60px;
+  }
+  .sec-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .sec-num {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 800;
+    flex-shrink: 0;
+  }
+  .num-teal   { background: var(--teal-dim);   color: var(--teal);   border: 1px solid rgba(0,201,167,0.4); }
+  .num-amber  { background: var(--amber-dim);  color: var(--amber);  border: 1px solid rgba(255,183,3,0.4); }
+  .num-coral  { background: var(--coral-dim);  color: var(--coral);  border: 1px solid rgba(224,92,92,0.4); }
+  .num-purple { background: var(--purple-dim); color: var(--purple); border: 1px solid rgba(155,114,207,0.4); }
+  .sec-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.6rem;
+    color: #fff;
+  }
+
+  /* === CARDS === */
+  .card {
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.25rem 1.5rem;
+    margin-bottom: 1.25rem;
+    backdrop-filter: blur(4px);
+  }
+  .card-title {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+  }
+  .ct-teal   { color: var(--teal); }
+  .ct-amber  { color: var(--amber); }
+  .ct-coral  { color: var(--coral); }
+  .ct-purple { color: var(--purple); }
+  .ct-blue   { color: var(--blue); }
+
+  /* === FORMULA BOXES === */
+  .formula-box {
+    border-radius: 10px;
+    padding: 1.1rem 1.4rem;
+    margin: 0.75rem 0;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14.5px;
+    line-height: 2;
+    position: relative;
+    overflow: hidden;
+  }
+  .formula-box::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    width: 4px;
+    border-radius: 4px 0 0 4px;
+  }
+  .fb-teal   { background: var(--teal-dim2);   border: 1px solid rgba(0,201,167,0.2); }
+  .fb-teal::before   { background: var(--teal); }
+  .fb-amber  { background: var(--amber-dim);   border: 1px solid rgba(255,183,3,0.2); }
+  .fb-amber::before  { background: var(--amber); }
+  .fb-coral  { background: var(--coral-dim);   border: 1px solid rgba(224,92,92,0.2); }
+  .fb-coral::before  { background: var(--coral); }
+  .fb-purple { background: var(--purple-dim);  border: 1px solid rgba(155,114,207,0.2); }
+  .fb-purple::before { background: var(--purple); }
+  .formula-box .label {
+    font-family: 'Nunito', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    opacity: 0.6;
+    display: block;
+    margin-bottom: 4px;
+  }
+  .formula-big {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+  }
+
+  /* === EXAMPLE BOXES === */
+  .example-box {
+    border-radius: 12px;
+    border: 1px solid;
+    overflow: hidden;
+    margin: 1rem 0;
+  }
+  .example-header {
+    padding: 0.6rem 1rem;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .ex-teal   { background: rgba(0,201,167,0.18);  border-color: rgba(0,201,167,0.3);  color: var(--teal); }
+  .ex-amber  { background: rgba(255,183,3,0.15);   border-color: rgba(255,183,3,0.3);  color: var(--amber); }
+  .ex-coral  { background: rgba(224,92,92,0.15);   border-color: rgba(224,92,92,0.3);  color: var(--coral); }
+  .ex-purple { background: rgba(155,114,207,0.15); border-color: rgba(155,114,207,0.3); color: var(--purple); }
+  .example-body {
+    padding: 1.1rem 1.25rem;
+    background: rgba(13,27,42,0.5);
+    border-top: 1px solid;
+  }
+  .example-body.et { border-color: rgba(0,201,167,0.15); }
+  .example-body.ea { border-color: rgba(255,183,3,0.15); }
+  .example-body.ec { border-color: rgba(224,92,92,0.15); }
+  .example-body.ep { border-color: rgba(155,114,207,0.15); }
+
+  /* === STEPS === */
+  .step {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin-bottom: 0.9rem;
+  }
+  .step-num {
+    min-width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 12px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 2px;
+    flex-shrink: 0;
+  }
+  .sn-t { background: var(--teal);   color: var(--navy); }
+  .sn-a { background: var(--amber);  color: var(--navy); }
+  .sn-c { background: var(--coral);  color: #fff; }
+  .sn-p { background: var(--purple); color: #fff; }
+  .step-content { flex: 1; }
+  .step-label {
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.6px;
+    opacity: 0.65;
+    margin-bottom: 2px;
+  }
+
+  /* === CODE/MATH === */
+  .math {
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    color: #e8f4ff;
+  }
+  .hl-t { color: var(--teal);   font-weight: 700; }
+  .hl-a { color: var(--amber);  font-weight: 700; }
+  .hl-c { color: var(--coral);  font-weight: 700; }
+  .hl-p { color: var(--purple); font-weight: 700; }
+  .hl-b { color: var(--blue);   font-weight: 700; }
+
+  /* === TRICK BOXES === */
+  .trick {
+    background: rgba(255,183,3,0.08);
+    border: 1px solid rgba(255,183,3,0.25);
+    border-left: 4px solid var(--amber);
+    border-radius: 0 10px 10px 0;
+    padding: 0.9rem 1.1rem;
+    margin: 0.9rem 0;
+    font-size: 14px;
+  }
+  .trick strong { color: var(--amber); }
+
+  .info {
+    background: rgba(78,168,222,0.08);
+    border: 1px solid rgba(78,168,222,0.2);
+    border-left: 4px solid var(--blue);
+    border-radius: 0 10px 10px 0;
+    padding: 0.9rem 1.1rem;
+    margin: 0.9rem 0;
+    font-size: 14px;
+  }
+  .info strong { color: var(--blue); }
+
+  /* === ANSWER HIGHLIGHT === */
+  .ans {
+    display: inline-block;
+    background: rgba(0,201,167,0.15);
+    border: 1px solid rgba(0,201,167,0.35);
+    color: var(--teal);
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-family: 'Source Code Pro', monospace;
+    font-size: 14px;
+    font-weight: 700;
+  }
+  .ans-a {
+    background: rgba(255,183,3,0.15);
+    border-color: rgba(255,183,3,0.35);
+    color: var(--amber);
+  }
+
+  /* === GRID === */
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+  @media (max-width: 650px) { .grid-2 { grid-template-columns: 1fr; } }
+
+  /* === CONDITION TABLE === */
+  .cond-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    margin: 0.5rem 0;
+  }
+  .cond-table th {
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border);
+  }
+  .cond-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid rgba(0,201,167,0.06);
+    font-family: 'Source Code Pro', monospace;
+    font-size: 13px;
+    vertical-align: top;
+  }
+  .cond-table tr:last-child td { border-bottom: none; }
+
+  /* === DIVIDER === */
+  .divider {
+    border: none;
+    border-top: 1px solid var(--border);
+    margin: 2.5rem 0;
+  }
+
+  p { margin-bottom: 0.6rem; }
+  ul, ol { padding-left: 1.5rem; margin-bottom: 0.6rem; }
+  li { margin-bottom: 4px; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <div class="nav-title">∇ Vector Calculus</div>
+    <a href="#curl">Curl</a>
+    <a href="#div">Divergence</a>
+    <a href="#line">Line Integrals</a>
+    <a href="#green">Green's Theorem</a>
+  </div>
+</nav>
+
+<div class="page">
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge">MT1008 · Multivariate Calculus</div>
+    <h1>Vector Calculus<br><span>Concept Notes & Solved Examples</span></h1>
+    <p>Clear formulas, step-by-step examples, and tricks for Curl, Divergence, Line Integrals, and Green's Theorem</p>
+    <div class="topic-pills">
+      <span class="pill pill-teal">curl ∇ × F</span>
+      <span class="pill pill-amber">divergence ∇ · F</span>
+      <span class="pill pill-coral">line integrals ∫_C</span>
+      <span class="pill pill-purple">Green's Theorem</span>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 1: CURL                        -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section" id="curl">
+    <div class="sec-header">
+      <div class="sec-num num-teal">1</div>
+      <div class="sec-title">Curl — <span style="color:var(--teal)">∇ × F</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-teal">What does curl mean?</div>
+      <p>Curl measures <strong>how much a vector field rotates or swirls</strong> around a point. Think of it like placing a tiny paddle wheel in a river — if it spins, there's curl. If it doesn't spin, curl is zero.</p>
+      <ul>
+        <li>Curl produces a <strong>vector</strong> (in 3D)</li>
+        <li>In 2D problems, we only care about the <em>z-component</em> of curl</li>
+        <li>Curl = 0 → the field is called <strong>irrotational</strong></li>
+      </ul>
+    </div>
+
+    <!-- 3D Formula -->
+    <div class="card">
+      <div class="card-title ct-teal">Formula — 3D Curl</div>
+      <p>For <span class="math">F = &lt;P, Q, R&gt;</span> or <span class="math">F = Pi + Qj + Rk</span>:</p>
+      <div class="formula-box fb-teal">
+        <span class="label">The determinant method (easiest to remember)</span>
+        <div class="formula-big">
+          curl F = ∇ × F =
+          |  i      j      k  |<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;| ∂/∂x  ∂/∂y  ∂/∂z |<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|  P     Q     R   |
+        </div>
+      </div>
+      <div class="formula-box fb-teal">
+        <span class="label">Expanded result</span>
+        <div class="formula-big">
+          curl F = <span class="hl-c">(R_y − Q_z)</span>i − <span class="hl-a">(R_x − P_z)</span>j + <span class="hl-t">(Q_x − P_y)</span>k
+        </div>
+      </div>
+      <div class="trick">
+        <strong>Memory trick:</strong> For each component, subtract the <em>mixed partial derivatives</em> in a cyclic pattern: (yz), (xz), (xy). The j-component gets a <strong>minus sign</strong>.
+      </div>
+    </div>
+
+    <!-- 2D Formula -->
+    <div class="card">
+      <div class="card-title ct-teal">Formula — 2D Curl (most common in exams)</div>
+      <p>For <span class="math">F = &lt;P(x,y), Q(x,y)&gt;</span> (R = 0):</p>
+      <div class="formula-box fb-teal">
+        <div class="formula-big">
+          curl F = <span class="hl-t">∂Q/∂x − ∂P/∂y</span>
+          &nbsp;&nbsp;← this is the z-component only
+        </div>
+      </div>
+      <div class="info">
+        <strong>When is curl = 0?</strong> If ∂Q/∂x = ∂P/∂y everywhere, the field is conservative (irrotational). This also means the line integral is path-independent!
+      </div>
+    </div>
+
+    <!-- SOLVED EXAMPLE 1 -->
+    <div class="example-box ex-teal">
+      <div class="example-header ex-teal">⚡ Solved Example 1.1 — 2D Curl</div>
+      <div class="example-body et">
+        <p style="margin-bottom:0.9rem;"><strong>Find the curl of</strong> <span class="math">F = &lt;x²y, xy² + x&gt;</span></p>
+
+        <div class="step">
+          <div class="step-num sn-t">1</div>
+          <div class="step-content">
+            <div class="step-label">Identify P and Q</div>
+            <span class="math">P = x²y &nbsp;&nbsp; Q = xy² + x</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-t">2</div>
+          <div class="step-content">
+            <div class="step-label">Compute partial derivatives</div>
+            <span class="math">∂Q/∂x = y² + 1 &nbsp;&nbsp;&nbsp; ∂P/∂y = x²</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-t">3</div>
+          <div class="step-content">
+            <div class="step-label">Apply the formula</div>
+            <span class="math">curl F = ∂Q/∂x − ∂P/∂y = (y² + 1) − x²</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-t">✓</div>
+          <div class="step-content">
+            <div class="step-label">Answer</div>
+            <span class="ans">curl F = y² − x² + 1</span>
+            <p style="margin-top:6px;font-size:13px;color:var(--text-muted)">Since this is not zero, the field is <em>not</em> conservative.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOLVED EXAMPLE 2 -->
+    <div class="example-box ex-teal">
+      <div class="example-header ex-teal">⚡ Solved Example 1.2 — 3D Curl</div>
+      <div class="example-body et">
+        <p style="margin-bottom:0.9rem;"><strong>Find curl F for</strong> <span class="math">F = &lt;yz, xz, xy&gt;</span></p>
+
+        <div class="step">
+          <div class="step-num sn-t">1</div>
+          <div class="step-content">
+            <div class="step-label">Set up: P = yz, Q = xz, R = xy</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-t">2</div>
+          <div class="step-content">
+            <div class="step-label">i-component: R_y − Q_z</div>
+            <span class="math">∂(xy)/∂y − ∂(xz)/∂z = x − x = <span class="hl-t">0</span></span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-t">3</div>
+          <div class="step-content">
+            <div class="step-label">j-component: −(R_x − P_z)</div>
+            <span class="math">−[∂(xy)/∂x − ∂(yz)/∂z] = −[y − y] = <span class="hl-t">0</span></span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-t">4</div>
+          <div class="step-content">
+            <div class="step-label">k-component: Q_x − P_y</div>
+            <span class="math">∂(xz)/∂x − ∂(yz)/∂y = z − z = <span class="hl-t">0</span></span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-t">✓</div>
+          <div class="step-content">
+            <div class="step-label">Answer</div>
+            <span class="ans">curl F = &lt;0, 0, 0&gt;</span>
+            <p style="margin-top:6px;font-size:13px;color:var(--text-muted)">Curl is zero → F is <strong>conservative</strong>. A potential function exists.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /section curl -->
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 2: DIVERGENCE                  -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section" id="div">
+    <div class="sec-header">
+      <div class="sec-num num-amber">2</div>
+      <div class="sec-title">Divergence — <span style="color:var(--amber)">∇ · F</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-amber">What does divergence mean?</div>
+      <p>Divergence measures <strong>how much a vector field spreads out from or converges to a point</strong>. Think of sources (water sprinklers) and sinks (drains).</p>
+      <div class="grid-2" style="margin-top:0.75rem;">
+        <div class="formula-box fb-amber" style="margin:0;">
+          <span class="label">div F &gt; 0</span>
+          Field is <span class="hl-a">spreading out</span> → source
+        </div>
+        <div class="formula-box fb-amber" style="margin:0;">
+          <span class="label">div F &lt; 0</span>
+          Field is <span class="hl-c">converging</span> → sink
+        </div>
+      </div>
+      <p style="margin-top:0.75rem;">Divergence = 0 → field is called <strong>incompressible</strong> or solenoidal</p>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-amber">Formula — Divergence</div>
+      <p>Divergence produces a <strong>scalar</strong> (just a number, not a vector!)</p>
+      <div class="formula-box fb-amber">
+        <span class="label">3D: F = &lt;P, Q, R&gt;</span>
+        <div class="formula-big">
+          div F = ∇ · F = <span class="hl-a">∂P/∂x + ∂Q/∂y + ∂R/∂z</span>
+        </div>
+      </div>
+      <div class="formula-box fb-amber">
+        <span class="label">2D: F = &lt;P, Q&gt;</span>
+        <div class="formula-big">
+          div F = ∇ · F = <span class="hl-a">∂P/∂x + ∂Q/∂y</span>
+        </div>
+      </div>
+      <div class="trick">
+        <strong>Key difference from curl:</strong> Divergence is always a <strong>scalar</strong>. Curl (in 3D) is a <strong>vector</strong>. In 2D, curl gives a scalar (the z-component only). Don't mix these up!
+      </div>
+    </div>
+
+    <!-- SOLVED EXAMPLE DIV 1 -->
+    <div class="example-box ex-amber">
+      <div class="example-header ex-amber">⚡ Solved Example 2.1 — 2D Divergence</div>
+      <div class="example-body ea">
+        <p style="margin-bottom:0.9rem;"><strong>Find div F for</strong> <span class="math">F = &lt;x³ + y², 3xy − y³&gt;</span></p>
+        <div class="step">
+          <div class="step-num sn-a">1</div>
+          <div class="step-content">
+            <div class="step-label">Identify P and Q</div>
+            <span class="math">P = x³ + y² &nbsp;&nbsp; Q = 3xy − y³</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-a">2</div>
+          <div class="step-content">
+            <div class="step-label">Compute partial derivatives</div>
+            <span class="math">∂P/∂x = 3x² &nbsp;&nbsp;&nbsp; ∂Q/∂y = 3x − 3y²</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-a">3</div>
+          <div class="step-content">
+            <div class="step-label">Add them</div>
+            <span class="math">div F = 3x² + 3x − 3y²</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-a">✓</div>
+          <div class="step-content">
+            <div class="step-label">Answer</div>
+            <span class="ans ans-a">div F = 3x² + 3x − 3y²</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOLVED EXAMPLE DIV 2 -->
+    <div class="example-box ex-amber">
+      <div class="example-header ex-amber">⚡ Solved Example 2.2 — 3D Divergence</div>
+      <div class="example-body ea">
+        <p style="margin-bottom:0.9rem;"><strong>Find div F for</strong> <span class="math">F = &lt;x²z, y sin(z), ze^(xy)&gt;</span></p>
+        <div class="step">
+          <div class="step-num sn-a">1</div>
+          <div class="step-content">
+            <div class="step-label">∂P/∂x (differentiate x²z with respect to x)</div>
+            <span class="math">∂(x²z)/∂x = 2xz</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-a">2</div>
+          <div class="step-content">
+            <div class="step-label">∂Q/∂y (differentiate y sin(z) with respect to y)</div>
+            <span class="math">∂(y sin z)/∂y = sin(z)</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-a">3</div>
+          <div class="step-content">
+            <div class="step-label">∂R/∂z (differentiate ze^(xy) with respect to z)</div>
+            <span class="math">∂(ze^(xy))/∂z = e^(xy)</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-a">✓</div>
+          <div class="step-content">
+            <div class="step-label">Answer</div>
+            <span class="ans ans-a">div F = 2xz + sin(z) + e^(xy)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="card">
+      <div class="card-title ct-amber">Quick Comparison: Curl vs Divergence</div>
+      <table class="cond-table">
+        <tr>
+          <th>Property</th>
+          <th>Curl (∇ × F)</th>
+          <th>Divergence (∇ · F)</th>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted)">Output type</td>
+          <td><span class="hl-t">Vector</span> (in 3D), scalar (in 2D)</td>
+          <td><span class="hl-a">Scalar</span> always</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted)">Measures</td>
+          <td>Rotation / swirling</td>
+          <td>Expansion / compression</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted)">= 0 means</td>
+          <td>Irrotational (conservative)</td>
+          <td>Incompressible (solenoidal)</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted)">Operation</td>
+          <td>Cross product: ∇ × F</td>
+          <td>Dot product: ∇ · F</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted)">2D formula</td>
+          <td>∂Q/∂x − ∂P/∂y</td>
+          <td>∂P/∂x + ∂Q/∂y</td>
+        </tr>
+      </table>
+    </div>
+
+  </div><!-- /section div -->
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 3: LINE INTEGRALS              -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section" id="line">
+    <div class="sec-header">
+      <div class="sec-num num-coral">3</div>
+      <div class="sec-title">Line Integrals — <span style="color:var(--coral)">∫_C F · dr</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-coral">What is a line integral?</div>
+      <p>A line integral computes the <strong>total effect of a vector field along a curve</strong>. Physical meaning: <em>work done</em> by force F moving along path C.</p>
+      <div class="info">
+        <strong>The key idea:</strong> You parametrize the curve C as r(t) = (x(t), y(t)), then convert everything into a single variable t and integrate normally.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-coral">Step-by-Step Method</div>
+      <div class="formula-box fb-coral">
+        <span class="label">Line integral formula</span>
+        <div class="formula-big">
+          ∫_C F · dr = ∫_a^b F(r(t)) · r'(t) dt
+        </div>
+      </div>
+      <div class="formula-box fb-coral">
+        <span class="label">Expanded (F = &lt;P,Q&gt;, r = &lt;x,y&gt;)</span>
+        <div class="formula-big">
+          = ∫_a^b [ P(x,y) dx/dt + Q(x,y) dy/dt ] dt
+        </div>
+      </div>
+
+      <p style="margin-top:0.75rem;font-weight:700;color:var(--text)">Always follow these 4 steps:</p>
+      <div class="step" style="margin-top:0.6rem;">
+        <div class="step-num sn-c">1</div>
+        <div class="step-content">
+          <strong>Parametrize C</strong> — write x(t), y(t) and find a, b
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num sn-c">2</div>
+        <div class="step-content">
+          <strong>Compute dr/dt</strong> — find dx/dt and dy/dt
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num sn-c">3</div>
+        <div class="step-content">
+          <strong>Substitute</strong> — replace x, y in F with x(t), y(t)
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num sn-c">4</div>
+        <div class="step-content">
+          <strong>Integrate</strong> — compute the definite integral in t
+        </div>
+      </div>
+    </div>
+
+    <!-- Parametrization Reference -->
+    <div class="card">
+      <div class="card-title ct-coral">Common Parametrizations (Memorize These!)</div>
+      <table class="cond-table">
+        <tr>
+          <th>Curve Type</th>
+          <th>Parametrization</th>
+          <th>Range</th>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted)">Straight line from (x₁,y₁) to (x₂,y₂)</td>
+          <td>x = x₁ + t(x₂−x₁)<br>y = y₁ + t(y₂−y₁)</td>
+          <td>t ∈ [0, 1]</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted)">Circle x²+y²=r², counterclockwise</td>
+          <td>x = r cos(t)<br>y = r sin(t)</td>
+          <td>t ∈ [0, 2π]</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted)">y = f(x), left to right</td>
+          <td>x = t<br>y = f(t)</td>
+          <td>t ∈ [a, b]</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted)">x = g(y), bottom to top</td>
+          <td>x = g(t)<br>y = t</td>
+          <td>t ∈ [a, b]</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- SOLVED EXAMPLE LINE 1 -->
+    <div class="example-box ex-coral">
+      <div class="example-header ex-coral">⚡ Solved Example 3.1 — Line integral along a line segment</div>
+      <div class="example-body ec">
+        <p style="margin-bottom:0.9rem;"><strong>Evaluate</strong> <span class="math">∫_C (xy) dx + (x + y) dy</span> where C is the line segment from (0,0) to (1,2).</p>
+
+        <div class="step">
+          <div class="step-num sn-c">1</div>
+          <div class="step-content">
+            <div class="step-label">Parametrize</div>
+            <span class="math">x = t, &nbsp; y = 2t, &nbsp; t ∈ [0, 1]</span>
+            <br><span style="font-size:13px;color:var(--text-muted)">(Use the standard line segment formula with (x₁,y₁)=(0,0), (x₂,y₂)=(1,2))</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-c">2</div>
+          <div class="step-content">
+            <div class="step-label">Find dx/dt and dy/dt</div>
+            <span class="math">dx/dt = 1, &nbsp;&nbsp; dy/dt = 2</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-c">3</div>
+          <div class="step-content">
+            <div class="step-label">Substitute P = xy and Q = x + y</div>
+            <span class="math">P = xy = (t)(2t) = 2t²</span><br>
+            <span class="math">Q = x + y = t + 2t = 3t</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-c">4</div>
+          <div class="step-content">
+            <div class="step-label">Build the integral</div>
+            <span class="math">∫₀¹ [2t²(1) + 3t(2)] dt = ∫₀¹ [2t² + 6t] dt</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-c">5</div>
+          <div class="step-content">
+            <div class="step-label">Integrate</div>
+            <span class="math">= [2t³/3 + 3t²]₀¹ = 2/3 + 3 = 2/3 + 9/3</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-c">✓</div>
+          <div class="step-content">
+            <div class="step-label">Answer</div>
+            <span class="ans" style="background:rgba(224,92,92,0.15);border-color:rgba(224,92,92,0.35);color:var(--coral);">= 11/3</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOLVED EXAMPLE LINE 2 (circle) -->
+    <div class="example-box ex-coral">
+      <div class="example-header ex-coral">⚡ Solved Example 3.2 — Line integral around a circle</div>
+      <div class="example-body ec">
+        <p style="margin-bottom:0.9rem;"><strong>Evaluate</strong> <span class="math">∫_C −y dx + x dy</span> where C is the unit circle x²+y²=1 (counterclockwise).</p>
+
+        <div class="step">
+          <div class="step-num sn-c">1</div>
+          <div class="step-content">
+            <div class="step-label">Parametrize the circle</div>
+            <span class="math">x = cos t, &nbsp; y = sin t, &nbsp; t ∈ [0, 2π]</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-c">2</div>
+          <div class="step-content">
+            <div class="step-label">Derivatives</div>
+            <span class="math">dx/dt = −sin t, &nbsp;&nbsp; dy/dt = cos t</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-c">3</div>
+          <div class="step-content">
+            <div class="step-label">Substitute P = −y = −sin t, Q = x = cos t</div>
+            <span class="math">∫₀²π [(−sin t)(−sin t) + (cos t)(cos t)] dt</span><br>
+            <span class="math">= ∫₀²π [sin²t + cos²t] dt = ∫₀²π 1 dt</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-c">✓</div>
+          <div class="step-content">
+            <div class="step-label">Answer</div>
+            <span class="ans" style="background:rgba(224,92,92,0.15);border-color:rgba(224,92,92,0.35);color:var(--coral);">= 2π</span>
+            <p style="margin-top:6px;font-size:13px;color:var(--text-muted)">Note: This equals 2 × (area of circle) = 2π(1)². This is actually Green's Theorem in action!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Conservative Fields Shortcut -->
+    <div class="card">
+      <div class="card-title ct-coral">Shortcut: Conservative Fields</div>
+      <p>If F is conservative (curl = 0), then there exists a potential function f such that F = ∇f, and:</p>
+      <div class="formula-box fb-coral">
+        <div class="formula-big">
+          ∫_C F · dr = f(end point) − f(start point)
+        </div>
+      </div>
+      <div class="trick">
+        <strong>Huge time saver!</strong> First check if curl F = 0. If yes, find potential function f (by integration), then just plug in endpoints. No need to parametrize at all!
+      </div>
+    </div>
+
+  </div><!-- /section line -->
+
+  <hr class="divider">
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- SECTION 4: GREEN'S THEOREM             -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section" id="green">
+    <div class="sec-header">
+      <div class="sec-num num-purple">4</div>
+      <div class="sec-title">Green's Theorem <span style="color:var(--purple)">∮ = ∬</span></div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-purple">The Big Idea</div>
+      <p>Green's Theorem connects a <strong>line integral around a closed curve</strong> to a <strong>double integral over the enclosed region</strong>. It's a shortcut — instead of integrating around the boundary, integrate over the area inside.</p>
+      <div class="info">
+        <strong>When to use it:</strong> The curve C must be <em>closed</em> (starts and ends at same point), <em>positively oriented</em> (counterclockwise), and <em>piecewise smooth</em>.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title ct-purple">The Formula</div>
+      <div class="formula-box fb-purple">
+        <span class="label">Green's Theorem</span>
+        <div class="formula-big">
+          <span class="hl-c">∮_C P dx + Q dy</span> = <span class="hl-p">∬_D (∂Q/∂x − ∂P/∂y) dA</span>
+        </div>
+      </div>
+      <div class="grid-2" style="margin-top:0.75rem;gap:0.75rem;">
+        <div class="formula-box fb-purple" style="margin:0;">
+          <span class="label">Left side</span>
+          Line integral around closed curve C
+        </div>
+        <div class="formula-box fb-purple" style="margin:0;">
+          <span class="label">Right side</span>
+          Double integral over region D inside C
+        </div>
+      </div>
+      <div class="trick" style="margin-top:0.75rem;">
+        <strong>Notice:</strong> The integrand on the right side is exactly the <strong>2D curl</strong> (∂Q/∂x − ∂P/∂y)! Green's Theorem = "curl integrated over area = circulation around boundary"
+      </div>
+    </div>
+
+    <!-- When to go which direction -->
+    <div class="card">
+      <div class="card-title ct-purple">Strategy: Which Direction to Convert?</div>
+      <table class="cond-table">
+        <tr><th>Situation</th><th>Convert to</th><th>Why</th></tr>
+        <tr>
+          <td style="color:var(--text-muted)">Curve C is complicated, region D is simple</td>
+          <td><span class="hl-p">→ Double integral</span></td>
+          <td>Easier to integrate over the region</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted)">Region D is complicated, C is simple</td>
+          <td><span class="hl-c">→ Line integral</span></td>
+          <td>Easier to walk along the boundary</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted)">∂Q/∂x − ∂P/∂y = constant</td>
+          <td><span class="hl-p">→ Double integral</span></td>
+          <td>Just multiply by area!</td>
+        </tr>
+        <tr>
+          <td style="color:var(--text-muted)">Finding area of region</td>
+          <td><span class="hl-p">→ Use area formula</span></td>
+          <td>Area = ½ ∮ (x dy − y dx)</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Area Formula -->
+    <div class="card">
+      <div class="card-title ct-purple">Bonus: Area Using Green's Theorem</div>
+      <div class="formula-box fb-purple">
+        <span class="label">Area of region D enclosed by C</span>
+        <div class="formula-big">
+          A = ½ ∮_C (x dy − y dx) = ∮_C x dy = −∮_C y dx
+        </div>
+      </div>
+      <p style="font-size:14px;color:var(--text-muted);margin-top:0.5rem;">These all give the same answer — use whichever is easiest to integrate.</p>
+    </div>
+
+    <!-- SOLVED EXAMPLE GREEN 1 -->
+    <div class="example-box ex-purple">
+      <div class="example-header ex-purple">⚡ Solved Example 4.1 — Applying Green's Theorem (forward)</div>
+      <div class="example-body ep">
+        <p style="margin-bottom:0.9rem;"><strong>Evaluate</strong> <span class="math">∮_C (y³) dx + (x³) dy</span> where C is the circle x²+y²=4 (counterclockwise).</p>
+
+        <div class="step">
+          <div class="step-num sn-p">1</div>
+          <div class="step-content">
+            <div class="step-label">Identify P and Q</div>
+            <span class="math">P = y³ &nbsp;&nbsp; Q = x³</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-p">2</div>
+          <div class="step-content">
+            <div class="step-label">Compute the curl integrand</div>
+            <span class="math">∂Q/∂x − ∂P/∂y = 3x² − 3y²</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-p">3</div>
+          <div class="step-content">
+            <div class="step-label">Apply Green's Theorem → switch to double integral over disk x²+y²≤4</div>
+            <span class="math">= ∬_D (3x² − 3y²) dA</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-p">4</div>
+          <div class="step-content">
+            <div class="step-label">Convert to polar: x = r cosθ, y = r sinθ, dA = r dr dθ, r ∈ [0,2], θ ∈ [0,2π]</div>
+            <span class="math">3x² − 3y² = 3r²cos²θ − 3r²sin²θ = 3r² cos(2θ)</span><br>
+            <span class="math">∫₀²π ∫₀² 3r² cos(2θ) · r dr dθ = ∫₀²π cos(2θ) dθ · ∫₀² 3r³ dr</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-p">5</div>
+          <div class="step-content">
+            <div class="step-label">Evaluate the θ-integral</div>
+            <span class="math">∫₀²π cos(2θ) dθ = [sin(2θ)/2]₀²π = 0</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-p">✓</div>
+          <div class="step-content">
+            <div class="step-label">Answer</div>
+            <span class="ans" style="background:rgba(155,114,207,0.15);border-color:rgba(155,114,207,0.35);color:var(--purple);">= 0</span>
+            <p style="margin-top:6px;font-size:13px;color:var(--text-muted)">The θ-integral being zero kills the whole thing. Without Green's Theorem, parametrizing this circle and cubing would be a nightmare!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SOLVED EXAMPLE GREEN 2 -->
+    <div class="example-box ex-purple">
+      <div class="example-header ex-purple">⚡ Solved Example 4.2 — Constant integrand (fastest case)</div>
+      <div class="example-body ep">
+        <p style="margin-bottom:0.9rem;"><strong>Evaluate</strong> <span class="math">∮_C (2y) dx + (5x) dy</span> where C is the square with vertices (0,0),(2,0),(2,2),(0,2) counterclockwise.</p>
+
+        <div class="step">
+          <div class="step-num sn-p">1</div>
+          <div class="step-content">
+            <div class="step-label">Identify P and Q</div>
+            <span class="math">P = 2y &nbsp;&nbsp; Q = 5x</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-p">2</div>
+          <div class="step-content">
+            <div class="step-label">Compute the curl integrand</div>
+            <span class="math">∂Q/∂x − ∂P/∂y = 5 − 2 = 3</span><br>
+            <span style="font-size:13px;color:var(--teal);">⟵ constant! This is the easiest case.</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-p">3</div>
+          <div class="step-content">
+            <div class="step-label">Apply Green's Theorem</div>
+            <span class="math">∬_D 3 dA = 3 × (Area of D)</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-p">4</div>
+          <div class="step-content">
+            <div class="step-label">Area of square = 2 × 2 = 4</div>
+            <span class="math">3 × 4 = 12</span>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num sn-p">✓</div>
+          <div class="step-content">
+            <div class="step-label">Answer</div>
+            <span class="ans" style="background:rgba(155,114,207,0.15);border-color:rgba(155,114,207,0.35);color:var(--purple);">= 12</span>
+            <p style="margin-top:6px;font-size:13px;color:var(--text-muted)">No integration needed! When the curl integrand is a constant, just multiply by the area.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /section green -->
+
+  <!-- ═══════════════════════════════════════ -->
+  <!-- FINAL CHEATSHEET                       -->
+  <!-- ═══════════════════════════════════════ -->
+  <div class="section" id="cheat">
+    <div class="sec-header" style="border-color:rgba(255,255,255,0.1);">
+      <div class="sec-num" style="background:rgba(255,255,255,0.08);color:#fff;border:1px solid rgba(255,255,255,0.2);">★</div>
+      <div class="sec-title" style="color:#fff;">Exam Cheatsheet — Common Mistakes & Fixes</div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card" style="border-color:rgba(224,92,92,0.3);">
+        <div class="card-title ct-coral">❌ Common Mistakes</div>
+        <ul style="font-size:14px;line-height:1.8;">
+          <li>Forgetting the <strong>minus sign</strong> in the j-component of 3D curl</li>
+          <li>Confusing curl (vector) with divergence (scalar)</li>
+          <li>Using the wrong parametrization range</li>
+          <li>Forgetting Green's Theorem needs <em>counterclockwise</em> orientation</li>
+          <li>Not substituting x(t), y(t) into F before integrating</li>
+          <li>Mixing up ∂Q/∂x and ∂P/∂y order in curl formula</li>
+        </ul>
+      </div>
+      <div class="card" style="border-color:rgba(0,201,167,0.3);">
+        <div class="card-title ct-teal">✅ Quick Checks</div>
+        <ul style="font-size:14px;line-height:1.8;">
+          <li>Curl 2D = <strong>∂Q/∂x − ∂P/∂y</strong> (Q first!)</li>
+          <li>Divergence 2D = <strong>∂P/∂x + ∂Q/∂y</strong> (add, don't subtract)</li>
+          <li>Always parametrize before computing a line integral</li>
+          <li>If curl = 0 on a line integral → use the potential function shortcut</li>
+          <li>Green's Theorem: only works for <em>closed</em> curves</li>
+          <li>If ∂Q/∂x − ∂P/∂y = constant → area trick!</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:0.75rem;border-color:rgba(155,114,207,0.25);">
+      <div class="card-title ct-purple">Decision Tree: Which Method to Use?</div>
+      <div style="font-size:14px;line-height:2.2;font-family:'Source Code Pro',monospace;">
+        <span class="hl-a">Given a line integral ∮_C P dx + Q dy:</span><br>
+        &nbsp;&nbsp;→ Is C <strong>closed</strong>? → <span class="hl-p">Try Green's Theorem</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ Is ∂Q/∂x − ∂P/∂y = constant? → <span class="hl-t">Multiply by area — done!</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ Otherwise → <span class="hl-p">set up double integral in polar or Cartesian</span><br>
+        &nbsp;&nbsp;→ Is C <strong>not closed</strong>?<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ Is F conservative (curl = 0)? → <span class="hl-t">Find potential fn, plug in endpoints</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;→ Otherwise → <span class="hl-c">Parametrize C, substitute, integrate in t</span>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+</body>
+</html>
